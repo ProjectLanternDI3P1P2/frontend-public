@@ -10,6 +10,21 @@
  * `nuxt.config.ts` → `routeRules` and justify it in `docs/rendering-modes.md`.
  */
 useHead({ title: "Public site" });
+
+const { $keycloak } = useNuxtApp();
+const isStartingLogin = ref(false);
+
+async function login() {
+  isStartingLogin.value = true;
+
+  try {
+    await $keycloak.login({ redirectUri: window.location.origin });
+  } finally {
+    // The browser normally leaves this page. Restore the button if the
+    // redirect cannot be initiated (for example, when Keycloak is offline).
+    isStartingLogin.value = false;
+  }
+}
 </script>
 
 <template>
@@ -19,6 +34,10 @@ useHead({ title: "Public site" });
       Architecture skeleton. Routes are added by the squad that owns the
       corresponding feature, with their rendering mode declared and justified.
     </p>
+
+    <UiButton :busy="isStartingLogin" @click="login">
+      Se connecter
+    </UiButton>
   </div>
 </template>
 

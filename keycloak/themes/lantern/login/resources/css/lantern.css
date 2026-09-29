@@ -1,0 +1,37 @@
+/* Project Lantern Keycloak login theme. */
+
+body {
+  background: #0b0b10;
+  color: #f4efe4;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+#kc-header-wrapper {
+  color: #e0b457;
+  font-family: "Palatino Linotype", Georgia, serif;
+}
+
+#kc-content-wrapper {
+  background: #12121b;
+  border: 1px solid #3a3a4f;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 55%);
+}
+
+#kc-form-login input[type="text"],
+#kc-form-login input[type="password"] {
+  background: #1b1b28;
+  border-color: #3a3a4f;
+  color: #f4efe4;
+}
+
+#kc-login {
+  background: #e0b457;
+  border-color: #e0b457;
+  color: #0b0b10;
+}
+
+#kc-login:hover {
+  background: #a97f24;
+  border-color: #a97f24;
+}

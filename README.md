@@ -40,6 +40,71 @@ cp .env.example .env
 npm run dev
 ```
 
+## Local authentication (Keycloak)
+
+Start a local Keycloak instance on port 8081 (port 8080 remains available for
+the API Gateway):
+
+```bash
+docker run -d --name keycloak-local -p 127.0.0.1:8081:8080 -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:26.7.4 start-dev
+```
+
+Open http://localhost:8081/admin and sign in to the `master` realm with:
+
+```text
+username: admin
+password: admin
+```
+
+Import the realm configuration from
+[`keycloak/realm/lantern-realm.json`](keycloak/realm/lantern-realm.json):
+
+1. In the realm selector at the top left, choose **Create realm**.
+2. Choose **Browse** and select `keycloak/realm/lantern-realm.json`.
+3. Click **Create**.
+
+The import creates a `lantern` realm with the public OIDC client
+`lantern-public`, Authorization Code + PKCE (`S256`), a `players` group mapped
+to the `player` role, and a `demo` / `demo` test account.
+
+Set `NUXT_PUBLIC_KEYCLOAK_URL` in `.env` to the URL of that instance. It must
+not use the same port as the API Gateway. The corresponding public runtime
+configuration is listed in `.env.example`. Do not reuse the test account or a
+development Keycloak setup outside local development.
+
+### Customize the login page
+
+The login theme source is in
+[`keycloak/themes/lantern`](keycloak/themes/lantern). Copy it to the running
+container, then restart Keycloak:
+
+```bash
+docker cp keycloak/themes/lantern keycloak-local:/opt/keycloak/themes/
+docker restart keycloak-local
+```
+
+In the Keycloak Admin Console, select the `lantern` realm and set:
+
+```text
+Realm settings → Themes → Login theme → lantern → Save
+```
+
+After changing `keycloak/themes/lantern/login/resources/css/lantern.css`, copy
+the updated files and restart the container again:
+
+```bash
+docker cp keycloak/themes/lantern/. keycloak-local:/opt/keycloak/themes/lantern/
+docker restart keycloak-local
+```
+
+Useful local commands:
+
+```bash
+docker logs -f keycloak-local  # Follow startup logs
+docker stop keycloak-local     # Stop it without deleting its data
+docker start keycloak-local    # Start the same local instance again
+```
+
 | Command                             | What it does                                   |
 | ----------------------------------- | ---------------------------------------------- |
 | `npm run dev`                       | Development server on http://localhost:3000    |

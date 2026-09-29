@@ -83,6 +83,11 @@ export default defineNuxtConfig({
       apiGatewayUrl:
         process.env.NUXT_PUBLIC_API_GATEWAY_URL || "http://localhost:8080",
       apiVersion: process.env.NUXT_PUBLIC_API_VERSION || "v1",
+      keycloakUrl:
+        process.env.NUXT_PUBLIC_KEYCLOAK_URL || "http://localhost:8081",
+      keycloakRealm: process.env.NUXT_PUBLIC_KEYCLOAK_REALM || "lantern",
+      keycloakClientId:
+        process.env.NUXT_PUBLIC_KEYCLOAK_CLIENT_ID || "lantern-public",
       telemetryEndpoint: process.env.NUXT_PUBLIC_TELEMETRY_ENDPOINT || "",
       appName: "public-site",
       appVersion: process.env.NUXT_PUBLIC_APP_VERSION || "dev",
