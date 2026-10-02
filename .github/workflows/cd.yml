@@ -16,10 +16,11 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: ProjectLanternDI3P1P2/platform-gitops/.github/workflows/publish-and-promote.yaml@b5ac372c8d41b074ab76d1de4a715a42f492ced4 # feat/argocd-delivery
+    uses: ProjectLanternDI3P1P2/platform-gitops/.github/workflows/publish-and-promote.yaml@f12cc5bf38c322f49d5045ee2beba53584ca19e7 # fix/frontend-prebuild
     with:
       application: frontend-public
       image: registry.lantern.diiage/lantern/frontend-public
+      prebuild_on_github: true
     secrets:
       HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
       HARBOR_TOKEN: ${{ secrets.HARBOR_TOKEN }}
