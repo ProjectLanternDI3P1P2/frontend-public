@@ -28,7 +28,8 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
+      - run: npm run postinstall
       # ADR-FE-015: the automated half of the accessibility criteria.
       - run: npm run lint
       - run: npm run typecheck
@@ -46,7 +47,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
 
       # The build carries its own identity, as the cycle 1 delivery gate asks.
       - name: Build
@@ -59,7 +60,13 @@ jobs:
       - name: Start the built application
         run: node .output/server/index.mjs &
       - name: Wait for the application
-        run: npx wait-on http://localhost:3000/healthz --timeout 60000
+        run: >-
+          curl --fail --silent --show-error --retry 30 --retry-all-errors
+          --retry-delay 2 --retry-max-time 60 --max-time 2 --output /dev/null
+          http://localhost:3000/healthz
+
+      - name: Install Cypress binary
+        run: npm run test:e2e:install
 
       - name: Cypress
         run: npm run test:e2e
@@ -84,15 +91,17 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm run build
 
       - name: Start the built application
         run: node .output/server/index.mjs &
       - name: Wait for the application
-        run: npx wait-on http://localhost:3000/healthz --timeout 60000
+        run: >-
+          curl --fail --silent --show-error --retry 30 --retry-all-errors
+          --retry-delay 2 --retry-max-time 60 --max-time 2 --output /dev/null
+          http://localhost:3000/healthz
 
-      # TODO enable light house later when the project is running
       # ADR-FE-014 — Lighthouse detects regressions on representative public
       # routes before a release. It is NOT the reference for real user
       # experience: the field measurements of ADR-FE-013 are.

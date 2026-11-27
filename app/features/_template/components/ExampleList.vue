@@ -20,7 +20,7 @@ defineProps<{
       This content could not be loaded.
     </p>
 
-    <ul v-else class="example-list__items" role="list">
+    <ul v-else class="example-list__items">
       <li v-for="item in items" :key="item.id" class="example-list__item">
         {{ item.label }}
       </li>
@@ -34,7 +34,6 @@ defineProps<{
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
-    list-style: none;
     padding: 0;
     margin: 0;
   }
@@ -44,6 +43,10 @@ defineProps<{
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-md);
+  }
+
+  &__item::marker {
+    content: "";
   }
 
   &__error {

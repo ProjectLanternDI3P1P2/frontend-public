@@ -21,7 +21,18 @@ describe("public shell", () => {
 
   it("has no detectable accessibility violation", () => {
     cy.visit("/");
+    cy.get("main#main").should("be.visible");
     cy.injectAxe();
     cy.checkA11y();
+  });
+
+  it("opens and closes the native quest dialog", () => {
+    cy.visit("/demo/feedback");
+    cy.contains("button", "Accept quest").click();
+    cy.get("dialog[open]")
+      .should("be.visible")
+      .and("have.attr", "aria-label", "The Ancient Crypt");
+    cy.get("dialog").contains("button", "Later").click();
+    cy.get("dialog").should("not.have.attr", "open");
   });
 });

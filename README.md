@@ -106,3 +106,8 @@ plugin remain the reference for real user experience (ADR-FE-013, ADR-FE-014).
 
 The public site targets RGAA compliance with **no expected exception**: nothing
 here is a gameplay constraint. See [docs/accessibility.md](docs/accessibility.md).
+
+# Container logs
+
+The server and relayed browser event schema is documented in
+[docs/container-logging.md](docs/container-logging.md).

@@ -78,9 +78,9 @@ export interface GatewayClient {
 }
 
 function defaultCorrelationId(): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto)
-    return crypto.randomUUID();
-  return `cid-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const randomWords = crypto.getRandomValues(new Uint32Array(4));
+  return `cid-${Array.from(randomWords, (word) => word.toString(16).padStart(8, "0")).join("")}`;
 }
 
 /** Builds `/api/v1/<path>?<query>` without ever leaking undefined parameters. */
@@ -90,7 +90,9 @@ export function buildGatewayUrl(
   path: string,
   query?: GatewayRequest["query"],
 ): string {
-  const normalisedBase = baseUrl.replace(/\/+$/, "");
+  let baseEnd = baseUrl.length;
+  while (baseUrl[baseEnd - 1] === "/") baseEnd--;
+  const normalisedBase = baseUrl.slice(0, baseEnd);
   const normalisedPath = path.replace(/^\/+/, "");
   const url = new URL(`${normalisedBase}/api/${apiVersion}/${normalisedPath}`);
 
@@ -109,8 +111,7 @@ export function createGatewayClient(
   async function request<TResponse>(req: GatewayRequest): Promise<TResponse> {
     const method = req.method ?? "GET";
     const correlationId = newCorrelationId();
-    const token =
-      req.token !== undefined ? req.token : (options.getToken?.() ?? null);
+    const { token = options.getToken?.() } = req;
 
     const headers: Record<string, string> = {
       Accept: "application/json",
