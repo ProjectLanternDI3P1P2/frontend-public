@@ -63,6 +63,22 @@ describe("createGatewayClient", () => {
     expect(init.headers.Authorization).toBeUndefined();
   });
 
+  it("does not send the default token when a request explicitly passes null", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ ok: true }));
+    const getToken = vi.fn().mockReturnValue("default-token");
+    const client = createGatewayClient({
+      baseUrl: "http://gw.test",
+      apiVersion: "v1",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      getToken,
+    });
+
+    await client.get("public/status", { token: null });
+
+    expect(getToken).not.toHaveBeenCalled();
+    expect(fetchImpl.mock.calls[0]?.[1].headers.Authorization).toBeUndefined();
+  });
+
   it("returns undefined for a 204 instead of trying to parse a body", async () => {
     const fetchImpl = vi
       .fn()

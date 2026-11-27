@@ -2,9 +2,8 @@
 
 FROM node:24.22.3-trixie-slim AS build
 WORKDIR /app
-ENV CYPRESS_INSTALL_BINARY=0
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 COPY . .
 RUN npm run build
 

@@ -29,6 +29,7 @@ defineEmits<{ "update:modelValue": [value: boolean] }>();
       type="checkbox"
       :name="name"
       role="switch"
+      :aria-checked="modelValue"
       :checked="modelValue"
       :disabled="disabled"
       @change="

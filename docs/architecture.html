@@ -1889,7 +1889,7 @@ sequenceDiagram
         var radios = document.querySelectorAll('input[name="adr-app"]');
         function apply(value) {
           rows.forEach(function (row) {
-            var app = row.getAttribute("data-app");
+            var app = row.dataset.app;
             row.hidden = !(value === "all" || app === "both" || app === value);
           });
         }
@@ -1898,21 +1898,25 @@ sequenceDiagram
             apply(radio.value);
             try {
               localStorage.setItem("adr-filter", radio.value);
-            } catch (e) {}
+            } catch {
+              // The current filter works even when storage is unavailable.
+            }
           });
         });
         try {
           var saved = localStorage.getItem("adr-filter");
           if (saved) {
-            var el = document.querySelector(
-              'input[name="adr-app"][value="' + saved + '"]',
-            );
+            var el = Array.prototype.find.call(radios, function (radio) {
+              return radio.value === saved;
+            });
             if (el) {
               el.checked = true;
               apply(saved);
             }
           }
-        } catch (e) {}
+        } catch {
+          // Keep the default filter when storage is unavailable.
+        }
       })();
     </script>
     <!-- Diagrams: rendered by Mermaid in any browser (needs an internet connection). -->

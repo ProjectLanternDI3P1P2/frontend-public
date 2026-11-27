@@ -1,13 +1,18 @@
 type Level = "debug" | "information" | "warning" | "error" | "fatal";
 type Origin = "server" | "browser";
 
-const secret = /\b(?:bearer\s+\S+|eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+|(?:api[_-]?key|token|password|secret)\s*[=:]\s*\S+|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})\b/gi;
 const allowedRouteRoots = new Set([
   "", "auth", "demo", "dungeon", "home", "leaderboard", "players", "rankings",
 ]);
 
 function safeText(value: string): string {
-  return value.replace(secret, "[redacted]").replace(/[\r\n]+/g, " ").slice(0, 500);
+  return value
+    .replace(/\bbearer\s+\S+/gi, "[redacted]")
+    .replace(/\beyj[a-z0-9_-]+\.[a-z0-9_-]+\.[a-z0-9_-]+/gi, "[redacted]")
+    .replace(/\b(?:api[_-]?key|token|password|secret)\s*[=:]\s*\S+/gi, "[redacted]")
+    .replace(/\b[a-z0-9._%+-]{1,64}@[a-z0-9.-]{1,253}\.[a-z]{2,63}\b/gi, "[redacted]")
+    .replace(/[\r\n]+/g, " ")
+    .slice(0, 500);
 }
 
 export function safeRoute(value: unknown): string | undefined {
