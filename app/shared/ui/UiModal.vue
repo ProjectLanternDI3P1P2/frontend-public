@@ -1,14 +1,6 @@
-<script lang="ts">
-import { onBeforeUnmount, onMounted } from "vue";
-
-export enum ModalSize {
-  SM = "sm",
-  MD = "md",
-  LG = "lg",
-}
-</script>
-
 <script setup lang="ts">
+import { useTemplateRef, watchPostEffect } from "vue";
+
 const props = withDefaults(
   defineProps<{
     modelValue: boolean;
@@ -35,32 +27,48 @@ const close = () => {
   emit("update:modelValue", false);
   emit("close");
 };
-const onKeydown = (event: KeyboardEvent) => {
-  if (props.modelValue && props.closeOnEscape && event.key === "Escape")
-    close();
-};
+const dialog = useTemplateRef<HTMLDialogElement>("dialog");
 
-onMounted(() => window.addEventListener("keydown", onKeydown));
-onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
+watchPostEffect(() => {
+  const element = dialog.value;
+  if (!element) return;
+  if (props.modelValue && !element.open) element.showModal();
+  else if (!props.modelValue && element.open) element.close();
+});
+
+function cancel() {
+  if (props.closeOnEscape) close();
+}
+</script>
+
+<script lang="ts">
+export enum ModalSize {
+  SM = "sm",
+  MD = "md",
+  LG = "lg",
+}
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="modelValue" class="ui-modal" role="presentation">
+  <Teleport to="#teleports">
+    <dialog
+      ref="dialog"
+      class="ui-modal"
+      :aria-label="title || 'Dialog'"
+      @cancel.prevent="cancel"
+    >
       <button
-        v-if="closeOnBackdrop"
+        v-if="modelValue && closeOnBackdrop"
         class="ui-modal__backdrop"
         type="button"
         aria-label="Close dialog"
+        tabindex="-1"
         @click="close"
       />
       <section
+        v-if="modelValue"
         class="ui-modal__dialog"
         :class="'ui-modal__dialog--' + size"
-        role="dialog"
-        aria-modal="true"
-        :aria-label="title"
-        tabindex="-1"
       >
         <header
           v-if="title || $slots.header || showCloseButton"
@@ -80,18 +88,30 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
           <slot name="footer" />
         </footer>
       </section>
-    </div>
+    </dialog>
   </Teleport>
 </template>
 
 <style scoped lang="scss">
 .ui-modal {
   position: fixed;
-  z-index: var(--z-overlay);
   inset: 0;
-  display: grid;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  border: 0;
   place-items: center;
   padding: var(--space-4);
+  background: transparent;
+  color: inherit;
+}
+.ui-modal[open] {
+  display: grid;
+}
+.ui-modal::backdrop {
   background-color: rgb(0 0 0 / 65%);
 }
 .ui-modal__backdrop {

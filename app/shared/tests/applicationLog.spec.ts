@@ -24,6 +24,21 @@ it("writes one JSON line for a server exception without credential text", () => 
   expect(entry.timestamp).toMatch(/\+00:00$/);
 });
 
+it("redacts credential assignments and JWTs from log messages", () => {
+  const write = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+
+  writeApplicationLog(
+    "error",
+    "server",
+    "JWT eyJheader.body.signature\nAPI_KEY=abc123; password: test-value",
+    {},
+  );
+
+  expect(JSON.parse(String(write.mock.calls[0]?.[0]))).toMatchObject({
+    message: "JWT [redacted] [redacted] [redacted]",
+  });
+});
+
 it("drops routes that might contain personal data", () => {
   expect(safeRoute("/players/12345")).toBe("/players");
   expect(safeRoute("/unknown/alice")).toBeUndefined();
